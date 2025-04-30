@@ -1,0 +1,3 @@
+C:/Users/ankur/mcp_filereader/editor/build/CMakeFiles/lite_cpp.dir
+C:/Users/ankur/mcp_filereader/editor/build/CMakeFiles/edit_cache.dir
+C:/Users/ankur/mcp_filereader/editor/build/CMakeFiles/rebuild_cache.dir

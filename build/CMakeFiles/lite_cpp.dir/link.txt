@@ -1,0 +1,3 @@
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E rm -f CMakeFiles\lite_cpp.dir/objects.a
+C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\lite_cpp.dir/objects.a @CMakeFiles\lite_cpp.dir\objects1.rsp
+C:\msys64\ucrt64\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\lite_cpp.dir/objects.a -Wl,--no-whole-archive -o lite_cpp.exe -Wl,--out-implib,liblite_cpp.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\lite_cpp.dir\linkLibs.rsp

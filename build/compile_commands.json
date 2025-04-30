@@ -1,0 +1,8 @@
+[
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\main.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\main.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/main.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/main.cpp.obj"
+}
+]

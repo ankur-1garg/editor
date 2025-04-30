@@ -1,0 +1,78 @@
+let intro = new-buf ();
+set-buf intro;
+insert "
+              Welcome to the...
+
+    +====================================+
+    |      _     _ _                     |
+    |     | |   (_) |_ ___               |
+    |     | |   | | __/ _ \\              |
+    |     | |___| | ||  __/              |
+    |     |_____|_|\\__\\___|              |
+    |      _____         _               |
+    |     |_   _|____  _| |_             |
+    |       | |/ _ \\ \\/ / __|            |
+    |       | |  __/>  <| |_             |
+    |       |_|\\___/_/\\_\\\\__|            |
+    |      _____    _ _ _                |
+    |     | ____|__| (_) |_ ___  _ __    |
+    |     |  _| / _` | | __/ _ \\| '__|   |
+    |     | |__| (_| | | || (_) | |      |
+    |     |_____\\__,_|_|\\__\\___/|_|      |
+    |                                    |
+    +====================================+
+
+    lite-cpp: A C++ port inspired by lite!
+
+    Lite is a simple text editor that is
+    designed to be simple but extensible.
+
+* Keybindings (Target)
+  --------------------
+
+  | Key             | Action                          |
+  | --------------- | ------------------------------- |
+  | Ctrl-q          | Quit the current buffer         |
+  | Ctrl-s          | Save the current buffer         |
+  | Ctrl-o          | Open a file                     |
+  | Ctrl-f          | Find text in the buffer         |
+  | Ctrl-a          | Select all text in the buffer   |
+  | Ctrl-c          | Copy text to the clipboard      |
+  | Ctrl-v          | Paste text from the clipboard   |
+  | Ctrl-z          | Undo the last action            |
+  | Ctrl-y          | Redo the last action            |
+  | Ctrl-n          | Create a new buffer             |
+  | Shft+<movement> | Move the cursor and select      |
+  | Alt-q           | Quit the editor                 |
+  | Alt-n           | Switch to the next buffer       |
+  | Alt-p           | Switch to the previous buffer   |
+  | Alt-<number>    | Switch to the <number>th buffer |
+  | Alt-!           | Enter a shell command           |
+  | Alt-e           | Evaluate a scripting command    |
+
+* Scripting
+  ---------
+
+  Lite-cpp aims to have a simple scripting language
+  for extending the editor. The configuration script
+  (like this one) allows defining custom commands.
+";
+# Go to the beginning of the intro buffer
+goto 0 0;
+
+# Define the 'dup' command example
+let dup = _ -> {
+  let selected = get-select ();
+  let old-select-end = get-select-end ();
+  let select-size = get-select-len ();
+  goto (get-select-end ());
+  unselect ();
+  insert (add "\n" selected);
+  goto old-select-end;
+  move 1;
+  select ();
+  move select-size;
+};
+
+# Set the initial buffer back (implementation might vary)
+# Maybe set-buf 0 or similar depending on initial buffer setup
