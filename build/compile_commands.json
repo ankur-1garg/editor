@@ -4,5 +4,59 @@
   "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\main.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\main.cpp",
   "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/main.cpp",
   "output": "CMakeFiles/lite_cpp.dir/src/main.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\Editor.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\Editor.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/Editor.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/Editor.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\Buffer.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\Buffer.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/Buffer.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/Buffer.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\Change.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\Change.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/Change.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/Change.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\frontend\\Terminal.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\frontend\\Terminal.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/frontend/Terminal.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/frontend/Terminal.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\lang\\Expr.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\lang\\Expr.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/lang/Expr.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/lang/Expr.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\lang\\Environment.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\lang\\Environment.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/lang/Environment.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/lang/Environment.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\lang\\Parser.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\lang\\Parser.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/lang/Parser.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/lang/Parser.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\lang\\Interpreter.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\lang\\Interpreter.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/lang/Interpreter.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/lang/Interpreter.cpp.obj"
+},
+{
+  "directory": "C:/Users/ankur/mcp_filereader/editor/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe   -g -std=c++17 -o CMakeFiles\\lite_cpp.dir\\src\\lang\\Builtin.cpp.obj -c C:\\Users\\ankur\\mcp_filereader\\editor\\lite-cpp\\src\\lang\\Builtin.cpp",
+  "file": "C:/Users/ankur/mcp_filereader/editor/lite-cpp/src/lang/Builtin.cpp",
+  "output": "CMakeFiles/lite_cpp.dir/src/lang/Builtin.cpp.obj"
 }
 ]

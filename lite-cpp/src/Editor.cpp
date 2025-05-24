@@ -247,48 +247,55 @@ void Editor::insertNewline() {
     }
 }
 void Editor::moveCursor(Direction dir, bool selecting) {
-    if (Buffer* buf = getCurrentBufferInternal()) {
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf) {
         buf->moveCursor(dir, selecting);
     }
 }
 
 void Editor::moveCursorPageUp(bool selecting) {
-     if (Buffer* buf = getCurrentBufferInternal() && m_frontend) {
-         int linesToMove = m_frontend->getHeight(); // Move by screen height
-         for (int i = 0; i < linesToMove; ++i) {
-              buf->moveCursor(Direction::Up, selecting);
-         }
-     }
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf && m_frontend) {
+        int linesToMove = m_frontend->getHeight(); // Move by screen height
+        for (int i = 0; i < linesToMove; ++i) {
+            buf->moveCursor(Direction::Up, selecting);
+        }
+    }
 }
 void Editor::moveCursorPageDown(bool selecting) {
-      if (Buffer* buf = getCurrentBufferInternal() && m_frontend) {
-         int linesToMove = m_frontend->getHeight(); // Move by screen height
-         for (int i = 0; i < linesToMove; ++i) {
-              buf->moveCursor(Direction::Down, selecting);
-         }
-     }
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf && m_frontend) {
+        int linesToMove = m_frontend->getHeight(); // Move by screen height
+        for (int i = 0; i < linesToMove; ++i) {
+            buf->moveCursor(Direction::Down, selecting);
+        }
+    }
 }
 void Editor::moveCursorStartOfLine(bool selecting) {
-     if (Buffer* buf = getCurrentBufferInternal()) {
-         buf->setCursorPosition(buf->getCursorRow(), 0); // Simple version
-         // TODO: handle selection update
-     }
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf) {
+        buf->setCursorPosition(buf->getCursorRow(), 0); // Simple version
+        // TODO: handle selection update
+    }
 }
 void Editor::moveCursorEndOfLine(bool selecting) {
-      if (Buffer* buf = getCurrentBufferInternal()) {
-          buf->setCursorPosition(buf->getCursorRow(), buf->getLine(buf->getCursorRow()).length());
-          // TODO: handle selection update
-     }
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf) {
+        buf->setCursorPosition(buf->getCursorRow(), buf->getLine(buf->getCursorRow()).length());
+        // TODO: handle selection update
+    }
 }
 
 
 void Editor::undo() {
-    if (Buffer* buf = getCurrentBufferInternal()) {
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf) {
         buf->undo();
     }
 }
 void Editor::redo() {
-    if (Buffer* buf = getCurrentBufferInternal()) {
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf) {
         buf->redo();
     }
 }
@@ -364,11 +371,26 @@ bool Editor::findInCurrentBuffer() {
 }
 
 void Editor::selectAll() {
-     if (Buffer* buf = getCurrentBufferInternal()) {
-         // TODO: Implement selectAll in Buffer class
-         // buf->setSelection(0, 0, buf->getLineCount() - 1, buf->getLine(buf->getLineCount() - 1).length());
-         // buf->setCursorPosition(buf->getLineCount() - 1, buf->getLine(buf->getLineCount() - 1).length());
-     }
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf) {
+        buf->selectStart();
+        buf->moveCursor(Direction::End, true);
+    }
+}
+
+std::optional<std::string> Editor::getSelectedText() const {
+    const Buffer* buf = getCurrentBuffer();
+    if (buf) {
+        return buf->getSelectedText();
+    }
+    return std::nullopt;
+}
+
+void Editor::startSelection() {
+    Buffer* buf = getCurrentBufferInternal();
+    if (buf) {
+        buf->selectStart();
+    }
 }
 void Editor::copySelection() {
      if (const Buffer* buf = getCurrentBuffer()) {
@@ -484,6 +506,198 @@ void Editor::setupBuiltins() {
 
 // --- Input Dispatch ---
 void Editor::handleInput(const InputEvent& event) {
+    bool selectionHandled = false; // Flag if selection logic should override default move
+
+    // --- Modifier Key Logic ---
+    if (event.modifiers == KeyModifier::Control) {
+        switch (event.character) {
+            case 's': saveCurrentBuffer(); return;
+            case 'q': { // Special handling for closing/quitting
+                 Buffer* buf = getCurrentBufferInternal();
+                 if (getBufferCount() <= 1 && buf && !buf->isEdited()) {
+                     m_shouldExit = true;
+                 } else {
+                     closeCurrentBuffer(); // Attempt to close buffer (might fail/prompt)
+                 }
+                 return;
+            }
+            case 'o': {
+                 auto path = m_frontend->prompt("Open file:");
+                 if (path && !path->empty()) openFile(*path);
+                 return;
+            }
+            case 'n': {
+                int newIdx = createNewBuffer();
+                switchToBuffer(newIdx);
+                return;
+            }
+            case 'z': undo(); return;
+            case 'y': redo(); return;
+            case 'c': copySelection(); return;
+            case 'x': cutSelection(); return;
+            case 'v': paste(); return;
+            case 'f': findInCurrentBuffer(); return;
+            case 'a': selectAll(); return;
+            case 'd': { // Ctrl+D often deletes forward or selection
+                 deleteForward();
+                 return;
+            }
+            default: break; // Unhandled Ctrl combo
+        }
+    } else if (event.modifiers == KeyModifier::Alt) {
+         // NOTE: Alt handling is basic here, real terminals often use Esc prefixes
+         switch (event.character) {
+             case 'q': { // Alt+Q quits editor
+                 m_shouldExit = true;
+                 return;
+             }
+             case 'n': nextBuffer(); return;
+             case 'p': prevBuffer(); return;
+             case 'e': evaluateScriptPrompt(); return;
+             case '!': runShellCommand(); return;
+             // Handle Alt+<number> for buffer switching
+             default:
+                if (event.character >= '0' && event.character <= '9') {
+                    int bufferIndex = event.character - '0';
+                    switchToBuffer(bufferIndex);
+                    return;
+                }
+                break;
+         }
+    } else if (event.modifiers == KeyModifier::Shift) {
+        // Handle Shift + Arrows/Home/End/PgUp/PgDn for selection
+        Buffer* buf = getCurrentBufferInternal();
+        if (buf) {
+            buf->startSelection();
+            selectionHandled = true;
+        }
+    }
+
+    // If selection movement happened, don't do default move
+    if (selectionHandled) return;
+
+    // --- Default Key Handling (No/Other Modifiers) ---
+    switch (event.code) {
+        case KeyCode::Char:      insertCharacter(event.character); break;
+        case KeyCode::Enter:     insertNewline(); break;
+        case KeyCode::Backspace: deleteBackward(); break;
+        case KeyCode::Delete:    deleteForward(); break;
+        case KeyCode::Tab:       insertString("    "); break; // Simple tab
+        case KeyCode::Left:      moveCursor(Direction::Left); break;
+        case KeyCode::Right:     moveCursor(Direction::Right); break;
+        case KeyCode::Up:        moveCursor(Direction::Up); break;
+        case KeyCode::Down:      moveCursor(Direction::Down); break;
+        case KeyCode::Home:      moveCursorStartOfLine(); break;
+        case KeyCode::End:       moveCursorEndOfLine(); break;
+        case KeyCode::PageUp:    moveCursorPageUp(); break;
+        case KeyCode::PageDown:  moveCursorPageDown(); break;
+        case KeyCode::Esc: {
+            if (Buffer* buf = getCurrentBufferInternal()) {
+                buf->clearSelection();
+            }
+            break;
+        }
+        case KeyCode::None:      // Ignore unknown/invalid keys
+        default:
+             break;
+    }
+    // More detailed input mapping than the simple example in main.cpp previously
+    bool selectionHandled = false; // Flag if selection logic should override default move
+
+    // --- Modifier Key Logic ---
+    if (event.modifiers == KeyModifier::Control) {
+        switch (event.character) {
+            case 's': saveCurrentBuffer(); return;
+            case 'q': { // Special handling for closing/quitting
+                 Buffer* buf = getCurrentBufferInternal();
+                 if (getBufferCount() <= 1 && buf && !buf->isEdited()) {
+                     m_shouldExit = true; // Changed from requestExit()
+                 } else {
+                     closeCurrentBuffer(); // Attempt to close buffer (might fail/prompt)
+                 }
+                 return;
+            }
+            case 'o': {
+                 auto path = m_frontend->prompt("Open file:");
+                 if (path && !path->empty()) openFile(*path);
+                 return;
+            }
+            case 'n': {
+                int newIdx = createNewBuffer();
+                switchToBuffer(newIdx);
+                return;
+            }
+            case 'z': undo(); return;
+            case 'y': redo(); return;
+            case 'c': copySelection(); return;
+            case 'x': cutSelection(); return;
+            case 'v': paste(); return;
+            case 'f': findInCurrentBuffer(); return;
+            case 'a': selectAll(); return;
+            case 'd': { // Ctrl+D often deletes forward or selection
+                 // TODO: If selection exists, delete selection, else delete forward
+                 deleteForward();
+                 return;
+            }
+            default: break; // Unhandled Ctrl combo
+        }
+    } else if (event.modifiers == KeyModifier::Alt) {
+         // NOTE: Alt handling is basic here, real terminals often use Esc prefixes
+         switch (event.character) {
+             case 'q': { // Alt+Q quits editor
+                 m_shouldExit = true; // Changed from requestExit()
+                 return;
+             }
+             case 'n': nextBuffer(); return;
+             case 'p': prevBuffer(); return;
+             case 'e': evaluateScriptPrompt(); return;
+             case '!': runShellCommand(); return;
+             // Handle Alt+<number> for buffer switching
+             default:
+                if (event.character >= '0' && event.character <= '9') {
+                    int bufferIndex = event.character - '0';
+                    switchToBuffer(bufferIndex);
+                    return;
+                }
+                break;
+         }
+    } else if (event.modifiers == KeyModifier::Shift) {
+        // Handle Shift + Arrows/Home/End/PgUp/PgDn for selection
+        Buffer* buf = getCurrentBufferInternal();
+        if (buf) {
+            buf->selectStart();
+            selectionHandled = true;
+        }
+    }
+
+    // If selection movement happened, don't do default move
+    if (selectionHandled) return;
+
+    // --- Default Key Handling (No/Other Modifiers) ---
+    switch (event.code) {
+        case KeyCode::Char:      insertCharacter(event.character); break;
+        case KeyCode::Enter:     insertNewline(); break;
+        case KeyCode::Backspace: deleteBackward(); break;
+        case KeyCode::Delete:    deleteForward(); break;
+        case KeyCode::Tab:       insertString("    "); break; // Simple tab
+        case KeyCode::Left:      moveCursor(Direction::Left); break;
+        case KeyCode::Right:     moveCursor(Direction::Right); break;
+        case KeyCode::Up:        moveCursor(Direction::Up); break;
+        case KeyCode::Down:      moveCursor(Direction::Down); break;
+        case KeyCode::Home:      moveCursorStartOfLine(); break;
+        case KeyCode::End:       moveCursorEndOfLine(); break;
+        case KeyCode::PageUp:    moveCursorPageUp(); break;
+        case KeyCode::PageDown:  moveCursorPageDown(); break;
+        case KeyCode::Esc: {
+            if (Buffer* buf = getCurrentBufferInternal()) {
+                buf->unselect();
+            }
+            break;
+        }
+        case KeyCode::None:      // Ignore unknown/invalid keys
+        default:
+             break;
+    }
     // More detailed input mapping than the simple example in main.cpp previously
     bool selectionHandled = false; // Flag if selection logic should override default move
 
@@ -519,39 +733,11 @@ void Editor::handleInput(const InputEvent& event) {
             case 'a': selectAll(); return;
             case 'd': { // Ctrl+D often deletes forward or selection
                  // TODO: If selection exists, delete selection, else delete forward
-                 deleteForward();
-                 return;
-            }
-            default: break; // Unhandled Ctrl combo
-        }
-    } else if (event.modifiers == KeyModifier::Alt) {
-         // NOTE: Alt handling is basic here, real terminals often use Esc prefixes
-         switch (event.character) {
-             case 'q': requestExit(); return; // Alt+Q quits editor
-             case 'n': nextBuffer(); return;
-             case 'p': prevBuffer(); return;
-             case 'e': evaluateScriptPrompt(); return;
-             case '!': runShellCommand(); return;
-             // Handle Alt+<number> for buffer switching
-             default:
-                if (event.character >= '0' && event.character <= '9') {
-                    int bufferIndex = event.character - '0';
-                    switchToBuffer(bufferIndex);
-                }
-                break;
-         }
-         return;
     } else if (event.modifiers == KeyModifier::Shift) {
         // Handle Shift + Arrows/Home/End/PgUp/PgDn for selection
-        switch (event.code) {
-            case KeyCode::Left:    moveCursor(Direction::Left, true); selectionHandled = true; break;
-            case KeyCode::Right:   moveCursor(Direction::Right, true); selectionHandled = true; break;
-            case KeyCode::Up:      moveCursor(Direction::Up, true); selectionHandled = true; break;
-            case KeyCode::Down:    moveCursor(Direction::Down, true); selectionHandled = true; break;
-            case KeyCode::Home:    moveCursorStartOfLine(true); selectionHandled = true; break;
-            case KeyCode::End:     moveCursorEndOfLine(true); selectionHandled = true; break;
-            case KeyCode::PageUp:  moveCursorPageUp(true); selectionHandled = true; break;
-            case KeyCode::PageDown:moveCursorPageDown(true); selectionHandled = true; break;
+        Buffer* buf = getCurrentBufferInternal();
+        if (buf) {
+            buf->selectStart();
             case KeyCode::Char:
                  // Simple uppercase insert for shifted chars
                  insertCharacter(std::toupper(event.character));

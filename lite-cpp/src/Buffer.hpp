@@ -78,7 +78,7 @@ public:
     // Moves cursor; if selecting is true, potentially starts/updates selection
     void moveCursor(Direction dir, bool selecting = false);
 
-    // Explicit selection control
+    // --- Selection Methods ---
     void selectStart();   // Sets the selection anchor at the current cursor pos
     void unselect();      // Clears the selection anchor
 

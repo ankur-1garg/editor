@@ -49,8 +49,10 @@ public:
 
     // --- Core Loop Control ---
     void run();                             // Starts the main event loop
-    bool shouldExit() const { return m_shouldExit; }
-    void requestExit() { m_shouldExit = true; }
+
+    // --- Selection Methods ---
+    std::optional<std::string> getSelectedText() const;
+    void startSelection();
 
     // --- Buffer Management ---
     int createNewBuffer();                  // Creates a new empty buffer, returns its index
@@ -84,6 +86,11 @@ public:
     void paste();
     bool runShellCommand();                 // Prompt for command, run, show output in new buffer
     bool evaluateScriptPrompt();            // Prompt for script, evaluate, show result
+    void insertString(const std::string& text);      // Insert a string at current cursor position
+    void gotoPosition(int line, int column);         // Move cursor to a specific position
+    bool hasSelection() const;                       // Check if there is an active selection
+    std::string getSelection() const;                // Get the currently selected text
+    void clearSelection();                           // Clear the current selection
 
     // --- Scripting Interaction ---
     Expr evaluateScript(const std::string& scriptText); // Parse & evaluate text

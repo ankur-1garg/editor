@@ -2,9 +2,10 @@
 
 #include "Common.hpp" // For Direction (might be needed later)
 #include <string>
-#include <memory> // For std::unique_ptr
+#include <memory>    // For std::unique_ptr
 #include <vector>
-#include <utility> // For std::pair
+#include <utility>   // For std::pair
+#include <optional>  // For std::optional
 
 // Forward declaration to avoid circular includes
 class Buffer;

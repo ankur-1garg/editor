@@ -1,9 +1,17 @@
 #pragma once
 
+// Platform-specific curses header inclusion
+#ifdef _WIN32
+#include <curses.h>  // PDCurses on Windows
+#else
+#include <ncurses.h> // ncurses on Unix-like systems
+#endif
+
 #include "IFrontend.hpp" // Inherits from the interface
 #include "Input.hpp"     // Uses InputEvent
 #include <string>
 #include <vector>       // For highlight rules maybe
+#include <optional>     // For std::optional
 
 // Forward declaration
 class Buffer;

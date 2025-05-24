@@ -1,0 +1,3 @@
+C:/Users/ankur/mcp_filereader/editor/lite-cpp/build/CMakeFiles/lite_cpp.dir
+C:/Users/ankur/mcp_filereader/editor/lite-cpp/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/ankur/mcp_filereader/editor/lite-cpp/build/CMakeFiles/ZERO_CHECK.dir

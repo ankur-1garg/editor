@@ -1,3 +1,4 @@
 {
-  "cmake.sourceDirectory": "C:/Users/ankur/mcp_filereader/editor/lite-cpp"
+  "cmake.sourceDirectory": "C:/Users/ankur/mcp_filereader/editor/lite-cpp",
+  "C_Cpp.default.compilerPath": "C:/msys64/ucrt64/bin/gcc.exe"
 }

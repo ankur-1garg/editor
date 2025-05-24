@@ -153,8 +153,19 @@ std::optional<std::string> Buffer::getSelectedText() const {
 
 // --- Setters / Modifiers Implementation ---
 
+void Buffer::startSelection() {
+    selectStart(); // Use existing selectStart method
+}
+
+void Buffer::selectStart() {
+    setSelectionStartInternal({m_cursorRow, m_cursorCol});
+}
+
+void Buffer::unselect() {
+    clearSelectionInternal();
+}
+
 void Buffer::setFilePath(const std::filesystem::path& path) {
-    // TODO: Should this create an undo action? Probably not.
     m_filePath = path;
 }
 
@@ -186,22 +197,25 @@ bool Buffer::saveAs(const std::filesystem::path& path) {
         return true;
     } else {
          std::cerr << "Error: Failed to write to file: " << path << std::endl;
-         file.close(); // Close even on failure
-         return false;
-    }
 }
 
 bool Buffer::save() {
-    if (!m_filePath) {
-        // Cannot save if no path is associated
-        return false;
+    if (!m_filePath) return false;
+    
+    std::ofstream file(*m_filePath);
+    if (!file) return false;
+    
+    for (const auto& line : m_lines) {
+        file << line << "\n";
     }
-    return saveAs(*m_filePath);
+    
+    m_isEdited = false;
+    return true;
 }
 
 void Buffer::setCursorPosition(int row, int col) {
-    // Public setter - might create an undo entry if position changes
-    int oldRow = m_cursorRow;
+    m_cursorRow = std::clamp(row, 0, static_cast<int>(m_lines.size()) - 1);
+    m_cursorCol = std::clamp(col, 0, static_cast<int>(m_lines[m_cursorRow].length()));
     int oldCol = m_cursorCol;
 
     m_cursorRow = row;
@@ -364,26 +378,20 @@ void Buffer::insertNewline() {
     m_isEdited = true;
 
     // Record undo
-    pushUndo(std::make_unique<InsertChange>(oldRow, oldCol, "\n"));
 }
 
 void Buffer::insertString(const std::string& text) {
-     // For undo purposes, it's often better to treat this as one operation
-     // if possible, rather than multiple char/newline inserts.
-     if (text.empty()) return;
-
-     if (hasSelection()) {
-          deleteSelection();
-     }
-
-     int oldRow = m_cursorRow;
-     int oldCol = m_cursorCol;
-
-     insertTextInternal(text); // Perform the insertion
-     m_isEdited = true;
-
-     // Single undo entry for the whole string
-     pushUndo(std::make_unique<InsertChange>(oldRow, oldCol, text));
+    size_t pos = 0;
+    while (pos < text.length()) {
+        size_t newlinePos = text.find('\n', pos);
+        if (newlinePos == std::string::npos) {
+            insertTextInternal(text.substr(pos));
+            break;
+        }
+        
+        insertTextInternal(text.substr(pos, newlinePos - pos));
+        insertNewline();
+        pos = newlinePos + 1;
 }
 
 void Buffer::deleteCharForward() { // Delete key
@@ -538,21 +546,11 @@ void Buffer::selectStart() {
      if (!m_selectionStart.has_value()) { // Only set if not already selecting
           std::pair<int, int> anchor = {m_cursorRow, m_cursorCol};
           auto oldSelection = m_selectionStart; // Will be nullopt here
-          setSelectionStartInternal(anchor);
-          pushUndo(std::make_unique<SelectChange>(oldSelection, anchor));
-     }
 }
 
 void Buffer::unselect() {
-      // Public action to clear selection anchor
-      if (m_selectionStart.has_value()) {
-           auto oldSelection = m_selectionStart; // Capture old value
-           clearSelectionInternal();
-           pushUndo(std::make_unique<UnselectChange>(*oldSelection));
-      }
+    clearSelectionInternal();
 }
-
-// --- Undo/Redo Implementation ---
 
 void Buffer::undo() {
     if (m_undoStack.empty()) {

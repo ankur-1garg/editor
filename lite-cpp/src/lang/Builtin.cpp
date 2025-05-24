@@ -42,7 +42,7 @@ Expr evalArg(const Expr& arg, Editor& editor, Environment& env) {
     // If not pre-evaluated (like Lisp), evaluation happens here.
 
     // Assuming Interpreter needs to be instantiated and called:
-     Interpreter interpreter(editor, std::make_shared<Environment>(env.shared_from_this())); // Use current env as parent
+     Interpreter interpreter(std::make_shared<Environment>(env)); // Use current env as parent
      return interpreter.evaluate(arg); // Evaluate the argument expression
 
     // --- OR --- if interpreter evaluates args before calling builtin:
@@ -193,22 +193,22 @@ Expr builtin_move(const std::vector<Expr>& args, Editor& editor, Environment& en
     Expr evaluatedArg = evalArg(args[0], editor, env);
 
     // Handle either integer offset or direction symbol/string
-    if (const long long* offset_ptr = std::get_if<long long>(&evaluatedArg)) {
+    if (auto* offset_ptr = std::get_if<long long>(&evaluatedArg)) {
         long long offset = *offset_ptr;
         Direction dir = (offset >= 0) ? Direction::Right : Direction::Left;
         long long count = std::abs(offset);
         for (long long i = 0; i < count; ++i) {
              editor.moveCursor(dir);
         }
-    } else if (const std::string* dir_str_ptr = std::get_if<std::string>(&evaluatedArg)) {
-         const std::string& dir_str = *dir_str_ptr;
+    } else if (auto* str_ptr = std::get_if<std::string>(&evaluatedArg)) {
+         const std::string& dir_str = *str_ptr;
          if (dir_str == "up") editor.moveCursor(Direction::Up);
          else if (dir_str == "down") editor.moveCursor(Direction::Down);
          else if (dir_str == "left") editor.moveCursor(Direction::Left);
          else if (dir_str == "right") editor.moveCursor(Direction::Right);
          else throw std::runtime_error("Builtin 'move' invalid direction string: " + dir_str);
-    } else if (const auto* sym_ptr_ptr = std::get_if<std::shared_ptr<ExprSymbol>>(&evaluatedArg)) {
-        const std::string& dir_str = (*sym_ptr_ptr)->name;
+    } else if (const auto* sym_ptr = std::get_if<std::shared_ptr<ExprSymbol>>(&evaluatedArg)) {
+        const std::string& dir_str = (*sym_ptr)->name;
          if (dir_str == "up") editor.moveCursor(Direction::Up);
          else if (dir_str == "down") editor.moveCursor(Direction::Down);
          else if (dir_str == "left") editor.moveCursor(Direction::Left);

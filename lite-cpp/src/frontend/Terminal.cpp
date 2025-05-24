@@ -2,8 +2,6 @@
 #include "../Editor.hpp"   // Needed for render/waitForInput access
 #include "../Buffer.hpp"   // Needed for buffer data access
 #include "../Common.hpp"   // Maybe for Direction if needed here
-
-#include <ncurses.h>       // The core ncurses library header
 #include <string>
 #include <vector>
 #include <cmath>           // For log10 in line number width calculation

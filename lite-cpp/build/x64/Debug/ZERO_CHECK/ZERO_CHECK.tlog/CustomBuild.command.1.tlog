@@ -1,0 +1,10 @@
+^C:\USERS\ANKUR\MCP_FILEREADER\EDITOR\LITE-CPP\BUILD\CMAKEFILES\F3500A53F07A8A595F65C946FA4A0C8B\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/ankur/mcp_filereader/editor/lite-cpp -BC:/Users/ankur/mcp_filereader/editor/lite-cpp/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/ankur/mcp_filereader/editor/lite-cpp/build/lite_cpp.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
